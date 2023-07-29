@@ -2,6 +2,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2/promise');
 const cTable = require('console.table');
+const Table = require('cli-table3');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -16,9 +17,6 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 });
-
-// Use the .promise() method to work with Promises
-//const promisePool = pool.promise();
 
 // Function to start the command-line application
 function startApp() {
@@ -119,7 +117,17 @@ function successMessage(message) {
 async function viewAllDepartments() {
   try {
     const [rows] = await pool.query('SELECT id, name FROM department');
-    console.table(rows);
+
+    // Define the custom style for the table
+    const table = new Table({
+      head: ['ID', 'Name'],
+      colWidths: [5, 20],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.id, row.name]));
+
+    console.log(table.toString());
     startApp();
   } catch (error) {
     console.error('\x1b[31mError retrieving departments:', error, '\x1b[0m');
@@ -131,7 +139,16 @@ async function viewAllDepartments() {
 async function viewAllRoles() {
   try {
     const [rows] = await pool.query('SELECT r.id, r.title, r.salary, d.name AS department FROM role r JOIN department d ON r.department_id = d.id');
-    console.table(rows);
+
+    const table = new Table({
+      head: ['ID', 'Title', 'Salary', 'Department'],
+      colWidths: [5, 30, 15, 30],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.id, row.title, row.salary, row.department]));
+
+    console.log(table.toString());
     startApp();
   } catch (error) {
     console.error('\x1b[31mError retrieving roles:', error, '\x1b[0m');
@@ -139,17 +156,28 @@ async function viewAllRoles() {
   }
 }
 
+
 // Function to view all employees
 async function viewAllEmployees() {
   try {
     const [rows] = await pool.query('SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, " ", m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON r.department_id = d.id LEFT JOIN employee m ON e.manager_id = m.id');
-    console.table(rows);
+
+    const table = new Table({
+      head: ['ID', 'First Name', 'Last Name', 'Job Title', 'Department', 'Salary', 'Manager'],
+      colWidths: [5, 15, 15, 30, 30, 15, 30],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.id, row.first_name, row.last_name, row.title, row.department, row.salary, row.manager]));
+
+    console.log(table.toString());
     startApp();
   } catch (error) {
     console.error('\x1b[31mError retrieving employees:', error, '\x1b[0m');
     startApp();
   }
 }
+
 
 // Function to add a department
 async function addDepartment() {
@@ -386,13 +414,23 @@ async function viewEmployeesByManager() {
     const [rows] = await pool.query('SELECT id, first_name, last_name FROM employee WHERE manager_id = ?', [
       answers.managerId,
     ]);
-    console.table(rows);
+
+    const table = new Table({
+      head: ['ID', 'First Name', 'Last Name'],
+      colWidths: [5, 15, 15],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.id, row.first_name, row.last_name]));
+
+    console.log(table.toString());
   } catch (error) {
     console.error('\x1b[31mError retrieving employees by manager:', error, '\x1b[0m');
   }
 
   startApp();
 }
+
 
 // Function to view employees by department
 async function viewEmployeesByDepartment() {
@@ -416,13 +454,23 @@ async function viewEmployeesByDepartment() {
     const [rows] = await pool.query('SELECT id, first_name, last_name FROM employee WHERE role_id IN (SELECT id FROM role WHERE department_id = ?)', [
       answers.departmentId,
     ]);
-    console.table(rows);
+
+    const table = new Table({
+      head: ['ID', 'First Name', 'Last Name'],
+      colWidths: [5, 15, 15],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.id, row.first_name, row.last_name]));
+
+    console.log(table.toString());
   } catch (error) {
     console.error('\x1b[31mError retrieving employees by department:', error, '\x1b[0m');
   }
 
   startApp();
 }
+
 
 // Function to delete a department
 async function deleteDepartment() {
@@ -546,13 +594,23 @@ async function viewDepartmentBudget() {
     const [rows] = await pool.query('SELECT SUM(salary) AS total_budget FROM role WHERE department_id = ?', [
       answers.departmentId,
     ]);
-    console.table(rows);
+
+    const table = new Table({
+      head: ['Total Budget'],
+      colWidths: [15],
+      style: { 'padding-left': 1, 'padding-right': 1, head: ['cyan', 'bold'], border: ['yellow'] },
+    });
+
+    rows.forEach((row) => table.push([row.total_budget]));
+
+    console.log(table.toString());
   } catch (error) {
     console.error('\x1b[31mError retrieving department budget:', error, '\x1b[0m');
   }
 
   startApp();
 }
+
 
 
 // Welcome message Design
