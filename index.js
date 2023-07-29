@@ -533,5 +533,31 @@ async function viewDepartmentBudget() {
   startApp();
 }
 
+
+// Welcome message Design
+
+// Text colors escape codes
+const textColorYellow = '\x1b[33m';
+const textColorCyan = '\x1b[36m';
+
+// Bold formatting escape code
+const textBold = '\x1b[1m';
+
+// Reset escape code
+const resetColorAndBold = '\x1b[0m';
+
+console.log('_______________________________________________');
+console.log(textBold+textColorYellow+'    Hello! Welcome to'+resetColorAndBold);
+console.log(textBold+textColorCyan+' ______      ____    ____    _________'+resetColorAndBold);
+console.log(textBold+textColorCyan+'|______|     ||\\    //||    ||_______|'+resetColorAndBold);
+console.log(textBold+textColorCyan+'||           || \\  // ||    ||        '+resetColorAndBold);
+console.log(textBold+textColorCyan+'||           ||  \\//  ||    ||_______  '+resetColorAndBold);
+console.log(textBold+textColorCyan+'||           ||       ||    ||______ | '+resetColorAndBold);
+console.log(textBold+textColorCyan+'||_____      ||       ||     ______| | '+resetColorAndBold);
+console.log(textBold+textColorCyan+'|______|     ||       ||    |______|_| '+resetColorAndBold);
+console.log('_______________________________________________');
+console.log('                                                          ');
+console.log('                                                          ');
+
 // Start the application
 startApp();

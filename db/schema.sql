@@ -25,7 +25,3 @@ CREATE TABLE employee (
   FOREIGN KEY (role_id) REFERENCES role(id),
   FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
-
-
-ALTER TABLE department MODIFY COLUMN id INT AUTO_INCREMENT;
-
