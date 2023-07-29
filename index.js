@@ -17,6 +17,9 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+// Use the .promise() method to work with Promises
+//const promisePool = pool.promise();
+
 // Function to start the command-line application
 function startApp() {
   inquirer
@@ -458,31 +461,47 @@ async function deleteRole() {
 
 // Function to delete an employee
 async function deleteEmployee() {
-  try {
-    const [employees] = await pool.query('SELECT id, first_name, last_name FROM employee');
-
-    const employeeChoices = employees.map((employee) => ({
-      name: `${employee.first_name} ${employee.last_name}`,
-      value: employee.id,
-    }));
-
-    const answers = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'employeeId',
-        message: 'Select the employee to delete:',
-        choices: employeeChoices,
-      },
-    ]);
-
-    await pool.query('DELETE FROM employee WHERE id = ?', [answers.employeeId]);
-    console.log('Employee deleted successfully.');
-  } catch (error) {
-    console.error('Error deleting employee:', error);
+    try {
+      const [employees] = await pool.query('SELECT id, first_name, last_name FROM employee');
+  
+      const employeeChoices = employees.map((employee) => ({
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      }));
+  
+      const answers = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'employeeId',
+          message: 'Select the employee to delete:',
+          choices: employeeChoices,
+        },
+      ]);
+  
+      // Get the manager_id of the employee to be deleted
+      const [employee] = await pool.query('SELECT manager_id FROM employee WHERE id = ?', [
+        answers.employeeId,
+      ]);
+      const { manager_id } = employee[0];
+  
+      // Update the manager_id of all employees referencing the employee to be deleted to NULL
+      if (manager_id !== null) {
+        await pool.query('UPDATE employee SET manager_id = NULL WHERE manager_id = ?', [
+          answers.employeeId,
+        ]);
+      }
+  
+      // Now, you can safely delete the employee
+      await pool.query('DELETE FROM employee WHERE id = ?', [answers.employeeId]);
+  
+      console.log('Employee deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+    }
+  
+    startApp();
   }
-
-  startApp();
-}
+  
 
 // Function to view the total utilized budget of a department
 async function viewDepartmentBudget() {
