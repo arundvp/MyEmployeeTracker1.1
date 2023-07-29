@@ -1,7 +1,6 @@
 // Import and require packages
 const inquirer = require('inquirer');
 const mysql = require('mysql2/promise');
-const cTable = require('console.table');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -103,16 +102,6 @@ function startApp() {
     });
 }
 
-
-// Function to display a success message in green text
-function successMessage(message) {
-  const boldGreen = '\x1b[1m\x1b[32m'; // Bold and green text
-  const resetStyle = '\x1b[0m'; // Reset text style to default
-
-  console.log(`${boldGreen}${message}${resetStyle}`);
-}
-
-
 // Implement the database queries and actions
 
 // Function to view all departments
@@ -164,7 +153,7 @@ async function addDepartment() {
     ]);
 
     await pool.query('INSERT INTO department (name) VALUES (?)', [answers.name]);
-    successMessage('Department added successfully.');
+    console.log('Department added successfully.');
   } catch (error) {
     console.error('\x1b[31mError adding department:', error, '\x1b[0m');
   }
@@ -218,7 +207,7 @@ async function addRole() {
       answers.salary,
       answers.department_id,
     ]);
-    successMessage('Role added successfully.');
+    console.log('Role added successfully.');
   } catch (error) {
     console.error('\x1b[31mError adding role:', error, '\x1b[0m');
   }
@@ -276,7 +265,7 @@ async function addEmployee() {
       answers.role_id,
       answers.manager_id,
     ]);
-    successMessage('Employee added successfully.');
+    console.log('Employee added successfully.');
   } catch (error) {
     console.error('\x1b[31mError adding employee:', error, '\x1b[0m');
   }
@@ -316,7 +305,7 @@ async function updateEmployeeRole() {
     ]);
 
     await pool.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.roleId, answers.employeeId]);
-    successMessage('Employee role updated successfully.');
+    console.log('Employee role updated successfully.');
   } catch (error) {
     console.error('\x1b[31mError updating employee role:', error, '\x1b[0m');
   }
@@ -356,7 +345,7 @@ async function updateEmployeeManager() {
     ]);
 
     await pool.query('UPDATE employee SET manager_id = ? WHERE id = ?', [answers.managerId, answers.employeeId]);
-    successMessage('Employee manager updated successfully.');
+    console.log('Employee manager updated successfully.');
   } catch (error) {
     console.error('\x1b[31mError updating employee manager:', error, '\x1b[0m');
   }
@@ -444,7 +433,7 @@ async function deleteDepartment() {
     ]);
 
     await pool.query('DELETE FROM department WHERE id = ?', [answers.departmentId]);
-    successMessage('Department deleted successfully.');
+    console.log('Department deleted successfully.');
   } catch (error) {
     console.error('\x1b[31mError deleting department:', error, '\x1b[0m');
   }
@@ -472,7 +461,7 @@ async function deleteRole() {
     ]);
 
     await pool.query('DELETE FROM role WHERE id = ?', [answers.roleId]);
-    successMessage('Role deleted successfully.');
+    console.log('Role deleted successfully.');
   } catch (error) {
     console.error('\x1b[31mError deleting role:', error, '\x1b[0m');
   }
@@ -515,7 +504,7 @@ async function deleteEmployee() {
       // Now, you can safely delete the employee
       await pool.query('DELETE FROM employee WHERE id = ?', [answers.employeeId]);
   
-      successMessage('Employee deleted successfully.');
+      console.log('Employee deleted successfully.');
     } catch (error) {
       console.error('\x1b[31mError deleting employee:', error, '\x1b[0m');
     }

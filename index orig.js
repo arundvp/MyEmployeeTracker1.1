@@ -1,4 +1,4 @@
-// Import and require packages
+// app.js
 const inquirer = require('inquirer');
 const mysql = require('mysql2/promise');
 const cTable = require('console.table');
@@ -103,16 +103,6 @@ function startApp() {
     });
 }
 
-
-// Function to display a success message in green text
-function successMessage(message) {
-  const boldGreen = '\x1b[1m\x1b[32m'; // Bold and green text
-  const resetStyle = '\x1b[0m'; // Reset text style to default
-
-  console.log(`${boldGreen}${message}${resetStyle}`);
-}
-
-
 // Implement the database queries and actions
 
 // Function to view all departments
@@ -122,7 +112,7 @@ async function viewAllDepartments() {
     console.table(rows);
     startApp();
   } catch (error) {
-    console.error('\x1b[31mError retrieving departments:', error, '\x1b[0m');
+    console.error('Error retrieving departments:', error);
     startApp();
   }
 }
@@ -134,7 +124,7 @@ async function viewAllRoles() {
     console.table(rows);
     startApp();
   } catch (error) {
-    console.error('\x1b[31mError retrieving roles:', error, '\x1b[0m');
+    console.error('Error retrieving roles:', error);
     startApp();
   }
 }
@@ -146,7 +136,7 @@ async function viewAllEmployees() {
     console.table(rows);
     startApp();
   } catch (error) {
-    console.error('\x1b[31mError retrieving employees:', error, '\x1b[0m');
+    console.error('Error retrieving employees:', error);
     startApp();
   }
 }
@@ -164,9 +154,9 @@ async function addDepartment() {
     ]);
 
     await pool.query('INSERT INTO department (name) VALUES (?)', [answers.name]);
-    successMessage('Department added successfully.');
+    console.log('Department added successfully.');
   } catch (error) {
-    console.error('\x1b[31mError adding department:', error, '\x1b[0m');
+    console.error('Error adding department:', error);
   }
 
   startApp();
@@ -175,16 +165,6 @@ async function addDepartment() {
 // Function to add a role
 async function addRole() {
   try {
-    // Check if the id column has AUTO_INCREMENT attribute
-    const [columns] = await pool.query('SHOW COLUMNS FROM role LIKE "id"');
-    const idColumn = columns[0];
-    const isAutoIncrement = idColumn.Extra.toLowerCase() === 'auto_increment';
-
-    if (!isAutoIncrement) {
-      // If the id column doesn't have AUTO_INCREMENT attribute, modify the table
-      await pool.query('ALTER TABLE role MODIFY COLUMN id INT AUTO_INCREMENT');
-    }
-
     const [departments] = await pool.query('SELECT id, name FROM department');
 
     const departmentChoices = departments.map((department) => ({
@@ -218,14 +198,13 @@ async function addRole() {
       answers.salary,
       answers.department_id,
     ]);
-    successMessage('Role added successfully.');
+    console.log('Role added successfully.');
   } catch (error) {
-    console.error('\x1b[31mError adding role:', error, '\x1b[0m');
+    console.error('Error adding role:', error);
   }
 
   startApp();
 }
-
 
 // Function to add an employee
 async function addEmployee() {
@@ -276,9 +255,9 @@ async function addEmployee() {
       answers.role_id,
       answers.manager_id,
     ]);
-    successMessage('Employee added successfully.');
+    console.log('Employee added successfully.');
   } catch (error) {
-    console.error('\x1b[31mError adding employee:', error, '\x1b[0m');
+    console.error('Error adding employee:', error);
   }
 
   startApp();
@@ -316,9 +295,9 @@ async function updateEmployeeRole() {
     ]);
 
     await pool.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.roleId, answers.employeeId]);
-    successMessage('Employee role updated successfully.');
+    console.log('Employee role updated successfully.');
   } catch (error) {
-    console.error('\x1b[31mError updating employee role:', error, '\x1b[0m');
+    console.error('Error updating employee role:', error);
   }
 
   startApp();
@@ -356,9 +335,9 @@ async function updateEmployeeManager() {
     ]);
 
     await pool.query('UPDATE employee SET manager_id = ? WHERE id = ?', [answers.managerId, answers.employeeId]);
-    successMessage('Employee manager updated successfully.');
+    console.log('Employee manager updated successfully.');
   } catch (error) {
-    console.error('\x1b[31mError updating employee manager:', error, '\x1b[0m');
+    console.error('Error updating employee manager:', error);
   }
 
   startApp();
@@ -388,7 +367,7 @@ async function viewEmployeesByManager() {
     ]);
     console.table(rows);
   } catch (error) {
-    console.error('\x1b[31mError retrieving employees by manager:', error, '\x1b[0m');
+    console.error('Error retrieving employees by manager:', error);
   }
 
   startApp();
@@ -418,7 +397,7 @@ async function viewEmployeesByDepartment() {
     ]);
     console.table(rows);
   } catch (error) {
-    console.error('\x1b[31mError retrieving employees by department:', error, '\x1b[0m');
+    console.error('Error retrieving employees by department:', error);
   }
 
   startApp();
@@ -444,9 +423,9 @@ async function deleteDepartment() {
     ]);
 
     await pool.query('DELETE FROM department WHERE id = ?', [answers.departmentId]);
-    successMessage('Department deleted successfully.');
+    console.log('Department deleted successfully.');
   } catch (error) {
-    console.error('\x1b[31mError deleting department:', error, '\x1b[0m');
+    console.error('Error deleting department:', error);
   }
 
   startApp();
@@ -472,9 +451,9 @@ async function deleteRole() {
     ]);
 
     await pool.query('DELETE FROM role WHERE id = ?', [answers.roleId]);
-    successMessage('Role deleted successfully.');
+    console.log('Role deleted successfully.');
   } catch (error) {
-    console.error('\x1b[31mError deleting role:', error, '\x1b[0m');
+    console.error('Error deleting role:', error);
   }
 
   startApp();
@@ -515,9 +494,9 @@ async function deleteEmployee() {
       // Now, you can safely delete the employee
       await pool.query('DELETE FROM employee WHERE id = ?', [answers.employeeId]);
   
-      successMessage('Employee deleted successfully.');
+      console.log('Employee deleted successfully.');
     } catch (error) {
-      console.error('\x1b[31mError deleting employee:', error, '\x1b[0m');
+      console.error('Error deleting employee:', error);
     }
   
     startApp();
@@ -548,7 +527,7 @@ async function viewDepartmentBudget() {
     ]);
     console.table(rows);
   } catch (error) {
-    console.error('\x1b[31mError retrieving department budget:', error, '\x1b[0m');
+    console.error('Error retrieving department budget:', error);
   }
 
   startApp();
